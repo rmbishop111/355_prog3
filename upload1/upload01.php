@@ -2,7 +2,7 @@
 
 // see HTML form (upload01.html) for overview of this program
 
-require_once ('functions01.php');
+require_once('functions01.php');
 
 // set PHP variables from data in HTML form 
 $fileName       = $_FILES['Filename']['name'];
