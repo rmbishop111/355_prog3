@@ -8,11 +8,10 @@
     <a href="https://github.com/rmbishop111/355_prog3" target="_blank">Github</a>
     <h1>File Upload</h1>
     <p style="padding-right: 40%">
-        This form will insert an image file (png/jpg/gif)
-        as a binary large object (BLOB),
-        as long as the file is smaller than 2MB.
-        Filename, file contents, and other file information
-        will be stored in the MySQL table, upload03. Actual image file will be stored in folder.
+        For images (png/jpg/gif) < than 2 MB in size.  The server does not allow uploads, but testing confirms
+        that the code works.  Also, determined that regular BLOB data types did not display images correctly.  Changed BLOB to
+        LONGBLOB and images are displayed correctly.  There is still an image in the DB that was uploaded as BLOB to show the difference.
+        A 'Show all files' link has been added to view all database entries.
     </p>
     <form method="post" action="upload.php"
           onsubmit="return Validate(this);"
@@ -57,6 +56,9 @@
             return true;
         }
     </script>
+
+    <br><br>
+    <a href="display.php">Show all files</a>
 
 
 </body>

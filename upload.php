@@ -52,10 +52,6 @@ if($fileSize > 2000000) { echo "Error: file exceeds 2MB."; exit(); }
 
 
 
-// if all of above is okay, then upload the file
-$result = move_uploaded_file($tempFileName, $fileFullPath);
-
-
 // put the content of the file into a variable, $content----------------------
 $fp      = fopen($tempFileName, 'r');
 $content = fread($fp, filesize($tempFileName));
@@ -63,20 +59,8 @@ $content = addslashes($content);
 fclose($fp);
 //----------------------------------------------------------------------------
 
-
-// connect to database--------------------------------------------------------
-$pdo = Database::connect();
-//----------------------------------------------------------------------------
-
-
-
-// insert file info and content into table------------------------------------
-$sql = "INSERT INTO upload (fileName, fileSize, fileType, description, fileLocation, content) "
-    . "VALUES ('$fileName', '$fileSize', '$fileType', '$fileDescription', '$fileFullPath', '$content')";
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$q = $pdo->prepare($sql);
-$q->execute(array());
-//----------------------------------------------------------------------------
+// if all of above is okay, then upload the file
+$result = move_uploaded_file($tempFileName, $fileFullPath);
 
 // if upload was successful, then add a record to the SQL database
 if ($result) {
@@ -93,6 +77,23 @@ if ($result) {
     echo "Upload denied for this file. Verify file size < 2MB. ";
 }
 
+
+// connect to database--------------------------------------------------------
+$pdo = Database::connect();
+//----------------------------------------------------------------------------
+
+
+
+// insert file info and content into table------------------------------------
+$sql = "INSERT INTO upload (fileName, fileSize, fileType, description, fileLocation, content) "
+    . "VALUES ('$fileName', '$fileSize', '$fileType', '$fileDescription', '$fileFullPath', '$content')";
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$q = $pdo->prepare($sql);
+$q->execute(array());
+//----------------------------------------------------------------------------
+
+
+
 // list all uploads in database-----------------------------------------------
 // ORDER BY BINARY filename ASC (sorts case-sensitive, like Linux)
 echo '<br><br><a href="index.html">back</a><br><br>All files in database...<br><br>';
@@ -102,8 +103,8 @@ $sql = 'SELECT * FROM upload '
 foreach ($pdo->query($sql) as $row) {
     $id = $row['id'];
     $sql = "SELECT * FROM upload where id=$id";
-    echo $row['id'] . ' - ' . $row['filename'] . '<br>'
-        . '<img width=100 src="data:image/jpeg;base64,'
+    echo $row['fileName'] . '<br>'
+        . '<img width=200 src="data:image/jpeg;base64,'
         . base64_encode( $row['content'] ).'"/>'
         . '<br><br>';
 }
