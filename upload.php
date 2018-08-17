@@ -27,8 +27,9 @@ if ($_FILES['Filename']['error'] !== UPLOAD_ERR_OK) {
     die("Error: Unable to determine <i>image</i> type of uploaded file");
 }
 
+$info = getimagesize($_FILES['Filename']['tmp_name']);
 if (($info[2] !== IMAGETYPE_GIF) && ($info[2] !== IMAGETYPE_JPEG)
-    && ($info[2] !== IMAGETYPE_PNG)) {
+    && ($info[2] !== IMAGETYPE_PNG) && ($info[2] !== IMAGETYPE_JPG)) {
     die("Not a gif/jpeg/png");
 }
 
@@ -55,14 +56,12 @@ if($fileSize > 2000000) { echo "Error: file exceeds 2MB."; exit(); }
 $result = move_uploaded_file($tempFileName, $fileFullPath);
 
 
-
 // put the content of the file into a variable, $content----------------------
 $fp      = fopen($tempFileName, 'r');
 $content = fread($fp, filesize($tempFileName));
 $content = addslashes($content);
 fclose($fp);
 //----------------------------------------------------------------------------
-
 
 
 // connect to database--------------------------------------------------------
@@ -73,7 +72,7 @@ $pdo = Database::connect();
 
 // insert file info and content into table------------------------------------
 $sql = "INSERT INTO upload (fileName, fileSize, fileType, description, fileLocation, content) "
-    . "VALUES ('$fileName', '$fileSize', '$fileType', $fileDescription, $fileFullPath, '$content')";
+    . "VALUES ('$fileName', '$fileSize', '$fileType', '$fileDescription', '$fileFullPath', '$content')";
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $q = $pdo->prepare($sql);
 $q->execute(array());
@@ -96,7 +95,7 @@ if ($result) {
 
 // list all uploads in database-----------------------------------------------
 // ORDER BY BINARY filename ASC (sorts case-sensitive, like Linux)
-echo '<br><br>All files in database...<br><br>';
+echo '<br><br><a href="index.html">back</a><br><br>All files in database...<br><br>';
 $sql = 'SELECT * FROM upload '
     . 'ORDER BY BINARY filename ASC;';
 
